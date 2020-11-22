@@ -4,18 +4,18 @@ export default class AddTask extends React.Component {
     state = {
         error: undefined
     };
+
     handleAddTask = (e) => {
         e.preventDefault();
         const task = e.target.elements.task.value.trim();
-        console.log(task);
         const error = this.props.handleAddTask(task);
-        console.log(error);
 
         this.setState(() => ({ error }));
         if (!error) {
             e.target.elements.task.value = '';
         }
     }
+    
     render(){
         return (
             <div className="row">

@@ -10,6 +10,14 @@ export default class TaskList extends React.Component {
     state = {
         tasks: []
     }
+
+    getAllTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        this.setState(() => ({ 
+            tasks: tasks || []
+        }));
+    }
+
     handleAddTask = (task) => {
         if (!task) {
             return 'Enter valid value to add task';
@@ -17,36 +25,49 @@ export default class TaskList extends React.Component {
             return 'This task already exists';
         }
 
-        this.setState((prevState) => ({ tasks: prevState.tasks.concat([task]) }));
+        this.setState((prevState) => ({
+            tasks: prevState.tasks.concat([task])
+        }), () => {
+            this.updateLocalStorage();
+        });
     }
+
+    updateLocalStorage() {
+        localStorage.setItem('tasks', JSON.stringify(this.state.tasks));
+    }
+
     handleClearTasks = () => {
-        this.setState(() => ({ tasks: [] }));
+        this.setState(() => ({
+            tasks: []
+        }), () => {
+            this.updateLocalStorage();
+        });
     }
+
     handleDeleteTask = (taskText) => {
         this.setState((prevState) => ({
             tasks: prevState.tasks.filter((task) => taskText !== task)
-        }));
+        }), () => {
+            this.updateLocalStorage();
+        });
     }
-    componentDidMount() {
-        try {
-            const json = localStorage.getItem('tasks');
-            const tasks = JSON.parse(json);
 
-            if (tasks) {
-                this.setState(() => ({ tasks }));
-            }
-        } catch (e) {
-            // Do nothing at all
-        }
-        console.log('componentDidMount');
+    componentDidMount() {
+        this.getAllTasks();
     }
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.tasks.length !== this.state.tasks.length) {
-            const json = JSON.stringify(this.state.tasks);
-            localStorage.setItem('tasks', json);
+
+    handleFilterText(value) {
+        if(value.length > 0) {
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const filteredTasks = tasks.filter(item => item.includes(value));
+            this.setState(() => ({
+                tasks: filteredTasks
+            }));
+        } else {
+            this.getAllTasks();
         }
-        console.log('componentDidUpdate');
     }
+    
     render() {
         return (
             <div className="container">
@@ -60,7 +81,7 @@ export default class TaskList extends React.Component {
                                 />
                                 <div className="card-action">
                                     <HeaderList />
-                                    <Filter />
+                                    <Filter handleFilterText={(value) => this.handleFilterText(value)} />
                                     <Tasks
                                         tasks={this.state.tasks}
                                         handleDeleteTask={this.handleDeleteTask}

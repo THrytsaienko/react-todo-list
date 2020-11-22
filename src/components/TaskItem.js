@@ -1,14 +1,19 @@
 import React from 'react';
+import styled from 'styled-components'
 
-const TaskItem = (props) => (
+const DeleteIcon = styled.i`
+    cursor: pointer;
+`
+
+const TaskItem = ({ taskText, handleDeleteTask }) => (
     <li className="collection-item">
-        {props.taskText}
+        {taskText}
         <a className='delete-item secondary-content'
-            onClick={(e) => {
-                props.handleDeleteTask(props.taskText);
+            onClick={() => {
+                handleDeleteTask(taskText);
             }}
         >
-            <i className="fa fa-remove"></i>
+            <DeleteIcon className="fa fa-remove"></DeleteIcon>
         </a>
     </li>
 )
